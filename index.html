@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO Tasks</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #e8ebc9;
+            font-size: 1.2em;
+        }
+
+        h2 {
+            padding: 12px;
+            margin: 10px;
+            font-size: 32px;
+            background: #e3bfbf;
+            border-radius: 10px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .editor-container label {
+            font-size: 20px;
+        }
+
+        .editor-container input {
+            padding: 2px 6px;
+            font-size: 1.15em;
+            margin: 5px;
+            border-radius: 8px;
+        }
+
+        .editor-container textarea {
+            padding: 8px;
+            margin-top: 23px;
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
+        .editor-container button {
+            padding: 4px;
+            margin-top: 5px;
+            font-size: 1em;
+            border-radius: 5px;
+        }
+
+        #notes-container {
+            margin: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #edf1b9;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .note {
+            position: relative;
+            flex: 250px;
+            max-width: 250px;
+            width: 250px;
+            padding: 10px;
+            padding-bottom: 45px;
+            margin: 10px;
+            font-family: cursive;
+            background: #fcfc64;
+            border: 1px solid black;
+            border-radius: 10px;
+            min-height: 230px;
+            box-shadow: 10px 10px 15px 0px #000000;
+        }
+
+        .note h3 {
+            border-bottom: 2px solid #000;
+        }
+
+        .note p{
+            overflow-y: auto;
+        }
+
+        .note button {
+            position: absolute;
+            float: right;
+            font-size: 1em;
+            padding: 5px;
+            border-radius: 5px;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        footer {
+            position: relative;
+            bottom: 0;
+            background: black;
+            color: white;
+            width: 70%;
+            height: 23px;
+            padding: 10px;
+            overflow: hidden;
+            border-radius: 20px;
+            left: -25px;
+            padding-left: 85px;
+            font-size: 25px;
+        }
+
+        footer span {
+            color: #e3bfbf;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <h2 class="center">TODO Tasks List</h2>
+    <div class="editor-container center">
+        <label for="title">Enter Title</label><br>
+        <input type="text" name="" id="title"><br>
+        <label for="editor">Write your task here</label><br>
+        <textarea name="" id="editor" cols="30" rows="10"></textarea><br>
+        <button id="add-note">Add To Task List</button>
+    </div>
+    <div id="notes-container">
+    </div>
+    <footer>
+        Developed by <span>Ali Amir</span>
+    </footer>
+    <script>
+        let notesArray = [];
+        window.onload = () => {
+            // Load notes on startup
+            notesArray = JSON.parse(localStorage.getItem('notes'));
+            if (notesArray == null) {
+                notesArray = [];
+                return
+            }
+            for (let i = 0; i < notesArray.length; i++) {
+                makeNote(notesArray[i]);
+            }
+
+        }
+
+        document.getElementById('add-note').addEventListener('click', () => {
+            //save note to localstorage
+            console.log('clicked');
+            let note = {
+                title: document.getElementById('title').value,
+                text: document.getElementById('editor').value
+            }
+            if(note.title === '' || note.text === ''){
+                return;
+            }
+            notesArray.push(note);
+            localStorage.setItem('notes', JSON.stringify(notesArray));
+            location.reload();
+        });
+
+        function makeNote(noteObj) {
+            let notesContainer = document.getElementById('notes-container');
+            let note = document.createElement('div');
+            let heading = document.createElement('h3');
+            let para = document.createElement('p');
+            let button = document.createElement('button');
+            button.setAttribute('class', 'remove-note');
+            button.setAttribute('onclick','removeNote(this.parentElement);');
+            heading.innerHTML = noteObj.title;
+            para.innerHTML = noteObj.text;
+            button.innerHTML = 'Done';
+            note.appendChild(heading);
+            note.appendChild(para);
+            note.appendChild(button);
+            note.setAttribute('class', 'note');
+            notesContainer.appendChild(note);
+        }
+
+        function removeNote(note){
+            let title = (note.childNodes)[0].innerHTML;
+            let text = (note.childNodes)[1].innerHTML;
+            for(let i = 0; i < notesArray.length; i++){
+                if(notesArray[i].title === title && notesArray[i].text === text){
+                    notesArray.splice(i,1);
+                    break;
+                }
+            }
+            localStorage.setItem('notes',JSON.stringify(notesArray));
+            location.reload();      
+        }
+    </script>
+</body>
+
+</html>
